@@ -1,9 +1,10 @@
 from flask import Flask
 import psycopg2
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 import os
 
-load_dotenv()
+dotenv_path = find_dotenv("../.env")
+load_dotenv(dotenv_path)
 
 POSTGRES_DB = os.getenv("POSTGRES_DB")
 POSTGRES_USER = os.getenv("POSTGRES_USER")
