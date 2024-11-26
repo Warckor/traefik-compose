@@ -1,5 +1,13 @@
 from flask import Flask
 import psycopg2
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+POSTGRES_DB = os.getenv("POSTGRES_DB")
+POSTGRES_USER = os.getenv("POSTGRES_USER")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 
 app = Flask(__name__)
 
@@ -7,7 +15,7 @@ app = Flask(__name__)
 def hello():
     try:
         conn = psycopg2.connect(
-            dbname="testdb", user="testuser", password="testpassword", host="db"
+            dbname=POSTGRES_DB, user=POSTGRES_USER, password=POSTGRES_PASSWORD, host="db"
         )
         return "Conexión a PostgreSQL exitosa"
     except Exception as e:
