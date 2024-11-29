@@ -2,34 +2,46 @@ services:
   traefik:
     image: traefik:2.11.14
     command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
+      - "--configFile=/etc/traefik/traefik.yml"
     ports:
       - "80:80"
-      - "8080:8080"
+      - "443:443"
     volumes:
+      - "./traefik/traefik.yaml:/etc/traefik/traefik.yml"
+      - "./traefik/certs:/certs"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls=true"
     networks:
-      - flask_network
+      - traefik_network
 
   frontend:
     build:
       context: ./frontend
     labels:
-      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`frontend.localhost`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls=true"
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
     networks:
-      - flask_network
+      - traefik_network
 
   app:
     build:
-      context: ./app
+      context: ./backend
     ports:
       - "5000:5000"
     labels:
-      - "traefik.http.routers.app.rule=Host(`localhost`) && PathPrefix(`/api`)"
-      - "traefik.http.services.app.loadbalancer.server.port=5000"
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`backend.localhost`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls=true"
+      - "traefik.http.services.backend.loadbalancer.server.port=5000"
     env_file:
       - ./.env
     environment:
@@ -39,7 +51,7 @@ services:
     depends_on:
       - db
     networks:
-      - flask_network
+      - traefik_network
 
   db:
     image: postgres:13
@@ -52,10 +64,10 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     networks:
-      - flask_network
+      - traefik_network
 
 networks:
-  flask_network:
+  traefik_network:
   
 volumes:
   db-data:
