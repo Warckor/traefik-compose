@@ -1,18 +1,16 @@
 from flask import Flask
+from flask_cors import CORS
 import psycopg2
-from dotenv import load_dotenv, find_dotenv
 import os
-
-dotenv_path = find_dotenv("../.env")
-load_dotenv(dotenv_path)
 
 POSTGRES_DB = os.getenv("POSTGRES_DB")
 POSTGRES_USER = os.getenv("POSTGRES_USER")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
-@app.route("/")
+@app.route('/data', methods=['GET'])
 def hello():
     try:
         conn = psycopg2.connect(
