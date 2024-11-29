@@ -43,7 +43,7 @@ services:
       - "traefik.http.routers.backend.tls=true"
       - "traefik.http.services.backend.loadbalancer.server.port=5000"
     env_file:
-      - ./.env
+      - ../.env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -56,7 +56,7 @@ services:
   db:
     image: postgres:13
     env_file:
-      - ./.env
+      - ../.env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -68,6 +68,8 @@ services:
 
 networks:
   traefik_network:
+    driver: bridge
+    external: true
   
 volumes:
   db-data:
