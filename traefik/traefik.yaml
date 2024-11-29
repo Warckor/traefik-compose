@@ -1,0 +1,18 @@
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+
+tls:
+  certificates:
+    - certFile: "/certs/backend.localhost+2.pem"
+      keyFile: "/certs/backend.localhost+2-key.pem"
+
+api:
+  dashboard: true
