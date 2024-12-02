@@ -1,0 +1,60 @@
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.1
+    container_name: elasticsearch
+    env_file:
+      - ./.env
+    environment:
+      discovery.type: single-node
+      ELASTIC_PASSWORD: ${ELASTIKSEARCH_PASSWORD}
+      ES_JAVA_OPTS: "-Xms1024m -Xms1024m"  # Ajusta estos valores según tus necesidades
+      xpack.security.http.ssl.enabled: false
+    ports:
+      - "${ELASTIKSEARCH_PORT}:${ELASTIKSEARCH_PORT}"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+      - es-credentials:/usr/share/elasticsearch/config
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 2G
+    networks:
+      - traefik_network
+  
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.16.1
+    container_name: kibana
+    env_file:
+      - ./.env
+    depends_on:
+      - elasticsearch
+    ports:
+      - "${KIBANA_PORT}:${KIBANA_PORT}"
+    networks:
+      - traefik_network
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.16.1
+    container_name: logstash
+    ports:
+      - "${LOGSTASH_PORT}:${LOGSTASH_PORT}"
+    env_file:
+      - ./.env
+    depends_on:
+      - elasticsearch
+    environment:
+      xpack.monitoring.elasticsearch.username: ${ELASTIKSEARCH_USERNAME}
+      xpack.monitoring.elasticsearch.password: ${ELASTIKSEARCH_PASSWORD}
+    volumes:
+      - ./logstash:/usr/share/logstash/pipeline
+    networks:
+      - traefik_network
+
+networks:
+  traefik_network:
+    external: true
+
+volumes:
+  es-data:
+  es-credentials:
