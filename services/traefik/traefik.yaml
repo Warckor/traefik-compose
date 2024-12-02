@@ -16,3 +16,8 @@ tls:
 
 api:
   dashboard: true
+
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addServicesLabels: true
