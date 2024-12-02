@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-home',
@@ -13,14 +12,9 @@ import { ApiService } from '../../services/api.service';
   `,
   styles: [``]
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent {
   data: any[] = [];
 
-  constructor(private apiService: ApiService) {}
+  constructor() {}
 
-  ngOnInit(): void {
-    this.apiService.getData().subscribe((response) => {
-      this.data = response;
-    });
   }
-}
