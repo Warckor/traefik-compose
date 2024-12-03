@@ -86,7 +86,7 @@ jobs:
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
           BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
         run: |
-          docker create network traefik_network
+          docker network create traefik_network
           docker compose -f ./services/compose.yaml up -d
 
           # Esperar unos segundos para que los servicios se inicialicen
