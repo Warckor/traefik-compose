@@ -4,8 +4,6 @@ services:
     container_name: traefik
     command:
       - "--configFile=/etc/traefik/traefik.yml"
-    env_file:
-      - ./.env
     ports:
       - "${TRAEFIK_HTTP_PORT}:${TRAEFIK_HTTP_PORT}"
       - "${TRAEFIK_HTTPS_PORT}:${TRAEFIK_HTTPS_PORT}"
@@ -37,8 +35,6 @@ services:
   app:
     build:
       context: ./backend
-    env_file:
-      - ./.env
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
     labels:
@@ -58,8 +54,6 @@ services:
 
   db:
     image: postgres:13
-    env_file:
-      - ./.env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
