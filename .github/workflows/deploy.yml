@@ -12,6 +12,8 @@ jobs:
   deploy:
     name: Deploy Docker Stack
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     
     env:
       TRAEFIK_HTTP_PORT: ${{ secrets.TRAEFIK_HTTP_PORT }}
