@@ -116,5 +116,6 @@ jobs:
       - name: Clean up services
         if: ${{ always() }}
         run: |
-          docker compose down
+          docker compose -f ./services/compose.yaml down
+          docker compose -f ./monitoring/compose.yaml down
           docker network rm traefik_network
