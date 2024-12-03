@@ -60,19 +60,21 @@ jobs:
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
           BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
         run: |
+          REPO=$(echo "${{ github.repository }}" | awk '{print tolower($0)}')
           docker build \
             --build-arg POSTGRES_USER=$POSTGRES_USER \
             --build-arg POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
             --build-arg POSTGRES_DB=$POSTGRES_DB \
             --build-arg BACKEND_PORT=$BACKEND_PORT \
-            -t ghcr.io/${{ github.repository }}/backend:latest ./services/backend
+            -t ghcr.io/$REPO/backend:latest ./services/backend
           
-          docker push ghcr.io/${{ github.repository }}/backend:latest
+          docker push ghcr.io/$REPO/backend:latest
 
       - name: Build and push Frontend Docker image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/frontend:latest ./services/frontend
-          docker push ghcr.io/${{ github.repository }}/frontend:latest
+          REPO=$(echo "${{ github.repository }}" | awk '{print tolower($0)}')
+          docker build -t ghcr.io/$REPO/frontend:latest ./services/frontend
+          docker push ghcr.io/$REPO/frontend:latest
       
       - name: Validate docker-compose services
         id: validate_services
