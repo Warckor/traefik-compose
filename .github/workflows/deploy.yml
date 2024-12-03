@@ -27,12 +27,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.ACTIONS_TOKEN }}
       
-      - name: Lint Dockerfiles
+      - name: Lint backend Dockerfile
         uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: |
-            ./services/backend/Dockerfile
-            ./services/frontend/Dockerfile
+          dockerfile: ./services/backend/Dockerfile
+
+      - name: Lint frontend Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: ./services/frontend/Dockerfile
 
       - name: Validate Docker Compose files
         run: |
