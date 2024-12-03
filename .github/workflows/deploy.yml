@@ -12,7 +12,18 @@ jobs:
   deploy:
     name: Deploy Docker Stack
     runs-on: ubuntu-latest
-        
+    
+    env:
+      TRAEFIK_HTTP_PORT: ${{ secrets.TRAEFIK_HTTP_PORT }}
+      TRAEFIK_HTTPS_PORT: ${{ secrets.TRAEFIK_HTTPS_PORT }}
+      BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
+      PROMETHEUS_PORT: ${{ secrets.PROMETHEUS_PORT }}
+      CADVISOR_PORT: ${{ secrets.CADVISOR_PORT }}
+      GRAFANA_PORT: ${{ secrets.GRAFANA_PORT }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -63,19 +74,14 @@ jobs:
           docker build -t ghcr.io/${{ github.repository }}/frontend:latest ./services/frontend
           docker push ghcr.io/${{ github.repository }}/frontend:latest
       
-      - name: Validate docker-compose stack
+      - name: Validate docker-compose services
+        id: validate_services
         env:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
           BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
         run: |
-          # Generar un archivo .env temporal con las variables de entorno
-          echo "POSTGRES_USER=$POSTGRES_USER" >> .env
-          echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env
-          echo "POSTGRES_DB=$POSTGRES_DB" >> .env
-          echo "BACKEND_PORT=$BACKEND_PORT" >> .env
-
           docker compose -f ./services/compose.yaml up -d
 
           # Esperar unos segundos para que los servicios se inicialicen
@@ -88,7 +94,21 @@ jobs:
             exit 1; 
           fi
 
+      - name: Validate docker-compose monitoring
+        run: |
+          docker compose -f ./monitoring/compose.yaml up -d
+
+          # Esperar unos segundos para que los servicios se inicialicen
+          sleep 10
+
+          # Verificar que todos los contenedores están saludables
+          if [ $(docker ps --filter "status=running" | wc -l) -lt 3 ]; then
+            echo "Not all containers are healthy"; 
+            docker-compose logs;
+            exit 1; 
+          fi
+
       - name: Clean up services
-        if: always()
+        if: ${{ failure() && steps.validate_services.conclusion == 'failure' }}
         run: |
           docker-compose down
