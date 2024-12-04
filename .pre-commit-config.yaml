@@ -29,8 +29,8 @@ repos:
         id: hadolint-docker
         entry: hadolint
         language: system
-        types: [file]
-        files: "Dockerfile$"
+        types: [dockerfile]
+        files: ".*Dockerfile$"
 
   # Validate YAML files
   - repo: https://github.com/adrienverge/yamllint
