@@ -1,0 +1,38 @@
+repos:
+  # Validate Docker Compose
+  - repo: local
+    hooks:
+      - name: Validate Docker Compose Files
+        id: validate-docker-compose
+        entry: docker compose -f ./services/compose.yaml config && docker compose -f ./monitoring/compose.yaml config
+        language: system
+        always_run: true
+
+  # Validate syntax of backend Dockerfiles
+  - repo: https://github.com/hadolint/hadolint
+    rev: v3.1.0
+    hooks:
+      - name: Lint Dockerfiles
+        id: hadolint
+        language: dockerfile
+        files: services/backend/Dockerfile
+
+  # Validate syntax of frontend Dockerfiles
+  - repo: https://github.com/hadolint/hadolint
+    rev: v3.1.0
+    hooks:
+      - name: Lint Dockerfiles
+        id: hadolint
+        language: dockerfile
+        files: services/frontend/Dockerfile
+
+  # Validate YAML files
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - name: Lint YAML files
+        id: yamllint
+        language: python
+        entry: yamllint
+        files: \.(yml|yaml)$
+        types: [yaml, file]
