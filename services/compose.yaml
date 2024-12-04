@@ -66,6 +66,6 @@ services:
 networks:
   traefik_network:
     external: true
-  
+
 volumes:
   db-data:

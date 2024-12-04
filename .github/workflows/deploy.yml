@@ -1,7 +1,7 @@
 name: Deploy Docker Stack
 
-on: 
-  push: 
+on:
+  push:
     branches:
       - master
   pull_request:
@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
-    
+
     env:
       TRAEFIK_HTTP_PORT: ${{ secrets.TRAEFIK_HTTP_PORT }}
       TRAEFIK_HTTPS_PORT: ${{ secrets.TRAEFIK_HTTPS_PORT }}
@@ -39,7 +39,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.ACTIONS_TOKEN }}
-      
+
       - name: Lint backend Dockerfile
         uses: hadolint/hadolint-action@v3.1.0
         with:
@@ -54,7 +54,7 @@ jobs:
         run: |
           docker compose -f ./services/compose.yaml config
           docker compose -f ./monitoring/compose.yaml config
-        
+
       - name: Build and push Backend Docker image
         env:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
@@ -69,7 +69,7 @@ jobs:
             --build-arg POSTGRES_DB=$POSTGRES_DB \
             --build-arg BACKEND_PORT=$BACKEND_PORT \
             -t ghcr.io/$REPO/backend:latest ./services/backend
-          
+
           docker push ghcr.io/$REPO/backend:latest
 
       - name: Build and push Frontend Docker image
@@ -77,7 +77,7 @@ jobs:
           REPO=$(echo "${{ github.repository }}" | awk '{print tolower($0)}')
           docker build -t ghcr.io/$REPO/frontend:latest ./services/frontend
           docker push ghcr.io/$REPO/frontend:latest
-      
+
       - name: Validate docker-compose services
         id: validate_services
         env:
@@ -94,9 +94,9 @@ jobs:
 
           # Verificar que todos los contenedores están saludables
           if [ $(docker ps --filter "status=running" | wc -l) -lt 4 ]; then
-            echo "Not all containers are healthy"; 
+            echo "Not all containers are healthy";
             docker-compose logs;
-            exit 1; 
+            exit 1;
           fi
 
       - name: Validate docker-compose monitoring
@@ -108,9 +108,9 @@ jobs:
 
           # Verificar que todos los contenedores están saludables
           if [ $(docker ps --filter "status=running" | wc -l) -lt 3 ]; then
-            echo "Not all containers are healthy"; 
+            echo "Not all containers are healthy";
             docker-compose logs;
-            exit 1; 
+            exit 1;
           fi
 
       - name: Clean up services

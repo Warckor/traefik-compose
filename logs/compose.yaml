@@ -21,7 +21,7 @@ services:
           memory: 2G
     networks:
       - traefik_network
-  
+
   kibana:
     image: docker.elastic.co/kibana/kibana:8.16.1
     container_name: kibana
