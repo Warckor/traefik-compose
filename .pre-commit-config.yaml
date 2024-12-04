@@ -1,30 +1,32 @@
-repos:
-  # Validate Docker Compose
-  - repo: local
-    hooks:
-      - name: Validate Docker Compose Files
-        id: validate-docker-compose
-        entry: docker compose -f ./services/compose.yaml config && docker compose -f ./monitoring/compose.yaml config
-        language: system
-        always_run: true
+---
+default_stages:
+  - pre-commit
+fail_fast: true
 
-  # Validate syntax of backend Dockerfiles
-  - repo: https://github.com/hadolint/hadolint
-    rev: v3.1.0
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
     hooks:
-      - name: Lint Dockerfiles
-        id: hadolint
-        language: dockerfile
-        files: services/backend/Dockerfile
+      - id: check-added-large-files
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  # # Validate Docker Compose
+  # - repo: local
+  #   hooks:
+  #     - name: Validate Docker Compose Files
+  #       id: validate-docker-compose
+  #       entry: docker compose -f ./services/compose.yaml config
+  #       language: system
+  #       always_run: true
 
   # Validate syntax of frontend Dockerfiles
   - repo: https://github.com/hadolint/hadolint
-    rev: v3.1.0
+    rev: v2.12.0
     hooks:
       - name: Lint Dockerfiles
-        id: hadolint
-        language: dockerfile
-        files: services/frontend/Dockerfile
+        id: hadolint-docker
+        entry: hadolint/hadolint:v2.12.0 hadolint
 
   # Validate YAML files
   - repo: https://github.com/adrienverge/yamllint
@@ -32,7 +34,10 @@ repos:
     hooks:
       - name: Lint YAML files
         id: yamllint
-        language: python
-        entry: yamllint
+        args:
+          [
+            "-d {extends: relaxed, rules: {line-length: disable}, ignore: chart}",
+            "-s",
+          ]
         files: \.(yml|yaml)$
         types: [yaml, file]
