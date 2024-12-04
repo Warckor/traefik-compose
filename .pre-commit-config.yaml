@@ -18,7 +18,7 @@ repos:
         id: validate-docker-compose
         entry: bash -c 'docker compose -f services/compose.yaml config && docker compose -f monitoring/compose.yaml config && docker compose -f logs/compose.yaml config'
         language: system
-        files: ".*/compose\\.ya?ml$"
+        files: "compose\\.ya?ml$"
         pass_filenames: false
 
   # Validate syntax of frontend Dockerfiles
@@ -29,8 +29,8 @@ repos:
         id: hadolint-docker
         entry: hadolint
         language: system
-        types: [dockerfile]
-        files: ".*/Dockerfile$"
+        types: [file]
+        files: "Dockerfile$"
 
   # Validate YAML files
   - repo: https://github.com/adrienverge/yamllint
