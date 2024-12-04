@@ -28,9 +28,8 @@ repos:
       - name: Lint Dockerfiles
         id: hadolint-docker
         entry: hadolint
-        language: system
-        types: [dockerfile]
-        files: ".*Dockerfile$"
+        language: docker_image
+        files: "(^|/)(D|d)ockerfile$"
 
   # Validate YAML files
   - repo: https://github.com/adrienverge/yamllint
