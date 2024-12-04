@@ -11,14 +11,15 @@ repos:
       - id: end-of-file-fixer
       - id: trailing-whitespace
 
-  # # Validate Docker Compose
-  # - repo: local
-  #   hooks:
-  #     - name: Validate Docker Compose Files
-  #       id: validate-docker-compose
-  #       entry: docker compose -f ./services/compose.yaml config
-  #       language: system
-  #       always_run: true
+  # Validate Docker Compose
+  - repo: local
+    hooks:
+      - name: Validate Docker Compose Files
+        id: validate-docker-compose
+        entry: bash -c 'docker compose -f services/compose.yaml config && docker compose -f monitoring/compose.yaml config && docker compose -f logs/compose.yaml config'
+        language: system
+        files: "compose\\.ya?ml$"
+        pass_filenames: false
 
   # Validate syntax of frontend Dockerfiles
   - repo: https://github.com/hadolint/hadolint
@@ -27,6 +28,8 @@ repos:
       - name: Lint Dockerfiles
         id: hadolint-docker
         entry: hadolint/hadolint:v2.12.0 hadolint
+        files: Dockerfile$|\.dockerfile$
+        language: docker_image
 
   # Validate YAML files
   - repo: https://github.com/adrienverge/yamllint
